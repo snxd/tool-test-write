@@ -1,6 +1,8 @@
+#ifdef _WINDOWS
 #include <io.h>
-#include <sys/stat.h>
 #include <share.h>
+#endif
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
