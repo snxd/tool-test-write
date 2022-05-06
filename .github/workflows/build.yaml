@@ -33,7 +33,7 @@ jobs:
       run: sudo apt-get install -y ninja-build
 
     - name: Generating project files
-      run: cmake -S . -B build ${{ matrix.cmake-args }} -D BUILD_SHARED_LIBS=OFF -D CMAKE_BUILD_TYPE=MinSizeRel
+      run: cmake -S . -B build ${{ matrix.cmake-args }} -D CMAKE_BUILD_TYPE=MinSizeRel
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.cxx-compiler }}
@@ -50,7 +50,7 @@ jobs:
           build/MinSizeRel/testwrite*
         retention-days: 7
 
-    - name: Upload artifacts (Linux)
+    - name: Upload artifacts (Linux/macOS)
       uses: actions/upload-artifact@v3
       if: runner.os != 'Windows'
       with:
