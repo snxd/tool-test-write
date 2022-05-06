@@ -1,17 +1,27 @@
-#ifdef _WINDOWS
-#include <io.h>
-#include <share.h>
-#endif
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <memory.h>
+#ifdef _WINDOWS
+#include <io.h>
+#include <share.h>
+
+#define open _open
+#define read _read
+#define write _write
+#define close _close
+#define unlink _unlink
+#else
+#include <unistd.h>
+
+#define O_BINARY 0
+#endif
 
 unsigned int randr(unsigned int min, unsigned int max) {
-       double scaled = (double)rand() / RAND_MAX;
-       return (unsigned int)((max - min +1) * scaled + min);
+    double scaled = (double)rand() / RAND_MAX;
+    return (unsigned int)((max - min +1) * scaled + min);
 }
 
 int main(int argc, char* argv[]) {
@@ -26,21 +36,21 @@ int main(int argc, char* argv[]) {
             Data[x] = (char)randr(0, 255);
         }
 
-        _unlink("test.bin");
+        unlink("test.bin");
 
-        int file = _sopen("test.bin", _O_RDWR | _O_CREAT |_O_BINARY, _SH_DENYNO, S_IREAD | S_IWRITE | S_IEXEC);
+        int file = open("test.bin", O_RDWR | O_CREAT | O_BINARY, S_IREAD | S_IWRITE | S_IEXEC);
         for (int x = 0; x < 30000; ++x) {
-            if (_write(file, Data, 16384) != 16384) {
+            if (write(file, Data, 16384) != 16384) {
                 printf("Bad Write\n");
             }
         }
 
-        _close(file);
+        close(file);
 
-        file = _sopen("test.bin", _O_RDONLY | _O_BINARY, _SH_DENYNO, S_IREAD | S_IWRITE | S_IEXEC);
+        file = open("test.bin", O_RDONLY | O_BINARY, S_IREAD | S_IWRITE | S_IEXEC);
         for (int x = 0; x < 30000; ++x) {
             memset(Compare, 0, 16384);
-            if (_read(file, Compare, 16384) != 16384) {
+            if (read(file, Compare, 16384) != 16384) {
                 printf("Bad Read\n");
             }
 
@@ -52,7 +62,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        _close(file);
+        close(file);
     }
 
     return 0;
